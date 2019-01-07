@@ -9,7 +9,7 @@ variable "token" {
 }
 
 variable "hosts" {
-  default = 0
+  default     = 0
   description = "Number of hosts to be created"
 }
 

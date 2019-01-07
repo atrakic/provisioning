@@ -1,14 +1,12 @@
 module "provider" {
   source = "./provider/hcloud"
 
-  project_name    = "demo"
-  token           = "${var.hcloud_token}"
-  #ssh_keys        = "${var.hcloud_ssh_keys}"
-  location        = "${var.hcloud_location}"
-  type            = "${var.hcloud_type}"
-  image           = "${var.hcloud_image}"
-  hosts           = "${var.node_count}"
-  #hostname_format = "${var.hostname_format}"
+  project_name = "demo"
+  token        = "${var.hcloud_token}"
+  location     = "${var.hcloud_location}"
+  type         = "${var.hcloud_type}"
+  image        = "${var.hcloud_image}"
+  hosts        = "${var.node_count}"
 }
 
 # module "provider" {

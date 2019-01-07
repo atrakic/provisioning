@@ -2,7 +2,7 @@
 
 .PHONY: all
 
-all: install init plan build
+all: install init update plan apply
 
 TERRAFORM := $(shell pwd)/terraform
 TMP ?= /tmp
@@ -23,10 +23,14 @@ init:
 	rm -rf .terraform/modules/
 	terraform init -reconfigure
 
-plan: init
-	terraform plan -refresh=true
+plan: update init
+	@terraform plan \
+		-input=false \
+                -module-depth=-1 \
+		-refresh=true
+#	-var-file=$(ENVIRONMENT).tfvars
 
-build: init
+apply: update init
 	terraform apply -auto-approve
 
 check: init
@@ -35,10 +39,20 @@ check: init
 destroy: init
 	terraform destroy -force
 
+show: init
+	@terraform show -module-depth=-1
+
+update:
+	@terraform get -update=true 1>/dev/null
+
 docs:
 	terraform-docs md . > README.md
 
-valid:
-	tflint
+graph:
+	@rm -f graph.png
+	@terraform graph -draw-cycles -module-depth=-1 | dot -Tpng > graph.png
+	@shotwell graph.png
+
+validate:  update
 	terraform fmt -check=true -diff=true
 	terraform validate -check-variables=true .
