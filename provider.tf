@@ -2,6 +2,10 @@ terraform {
   required_version = ">= 0.11.10"
 }
 
+provider "hcloud" {
+   version = ">=  1.7.0"
+}
+
 provider "external" {
   version = "1.0.0"
 }
