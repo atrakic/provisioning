@@ -2,8 +2,9 @@
 
 .PHONY: all
 
-all: install init update plan apply
+all: install init update plan
 
+ENVIRONMENT := dev
 TERRAFORM := $(shell pwd)/terraform
 TMP ?= /tmp
 OS ?= $(shell uname -s | tr '[:upper:]' '[:lower:]')
@@ -18,25 +19,25 @@ install: ## Install terraform
 	mv $(TMP)/terraform $(TERRAFORM) && \
 	rm -f $(TMP)/terraform.zip \
 	)
-
 init:
 	rm -rf .terraform/modules/
 	terraform init -reconfigure
 
 plan: update init
-	@terraform plan \
+	terraform plan \
 		-input=false \
                 -module-depth=-1 \
-		-refresh=true
-#	-var-file=$(ENVIRONMENT).tfvars
+		-refresh=true \
+	-var-file=environments/$(ENVIRONMENT).tfvars
 
 apply: update init
-	terraform apply -auto-approve
+	terraform apply -auto-approve \
+	-var-file=environments/$(ENVIRONMENT).tfvars
 
 check: init
 	terraform plan -detailed-exitcode
 
-destroy: init
+clean: init
 	terraform destroy -force
 
 show: init
