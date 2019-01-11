@@ -6,7 +6,7 @@
 project_name="demo"
 
 # Nr of hosts to create
-hosts=1
+hosts=3
 
 # `hcloud datacenter list`
 location="nbg1"
@@ -19,4 +19,4 @@ image="ubuntu-18.04"
 
 ### Optionals:
 # labels={ foo = "bar" }
-# apt_packages=["ceph-common"]
+apt_packages=["ceph-common"]
