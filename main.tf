@@ -7,6 +7,7 @@ module "provider" {
   type         = "${var.hcloud_type}"
   image        = "${var.hcloud_image}"
   hosts        = "${var.node_count}"
+  labels       = "${var.labels}"
 }
 
 # module "provider" {

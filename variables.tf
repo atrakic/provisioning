@@ -24,6 +24,11 @@ variable "hcloud_image" {
   default = "ubuntu-16.04"
 }
 
+variable "labels" {
+  type    = "map"
+  default = {}
+}
+
 /* scaleway */
 variable "scaleway_organization" {
   default = ""

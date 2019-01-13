@@ -30,8 +30,8 @@ plan: init update
 		-input=false \
 		-module-depth=-1 \
 		-refresh=true \
-		-state=environments/$(ENVIRONMENT)/terraform.tfstate \
-		-var-file=environments/$(ENVIRONMENT)/terraform.tfvars
+		-var-file=environments/$(ENVIRONMENT)/terraform.tfvars \
+		-state=environments/$(ENVIRONMENT)/terraform.tfstate
 
 plan-output: init update ## Write a plan file to the given commit. This can be used as input to the "apply" command
 	terraform plan \
