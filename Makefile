@@ -4,7 +4,8 @@
 
 all: install init update plan
 
-ENVIRONMENT := dev
+ENVIRONMENT ?= dev
+COMMIT = $(shell git rev-parse --short HEAD)
 TERRAFORM := $(shell pwd)/terraform
 TMP ?= /tmp
 OS ?= $(shell uname -s | tr '[:upper:]' '[:lower:]')
@@ -19,29 +20,44 @@ install: ## Install terraform
 	mv $(TMP)/terraform $(TERRAFORM) && \
 	rm -f $(TMP)/terraform.zip \
 	)
+
 init:
 	rm -rf .terraform/modules/
 	terraform init -reconfigure
 
-plan: update init
+plan: init update
 	terraform plan \
 		-input=false \
-                -module-depth=-1 \
+		-module-depth=-1 \
 		-refresh=true \
-	-var-file=environments/$(ENVIRONMENT).tfvars
+		-state=environments/$(ENVIRONMENT)/terraform.tfstate \
+		-var-file=environments/$(ENVIRONMENT)/terraform.tfvars
+
+plan-output: init update ## Write a plan file to the given commit. This can be used as input to the "apply" command
+	terraform plan \
+      -input=true \
+      -refresh=true \
+      -var-file=environments/$(ENVIRONMENT)/terraform.tfvars \
+      -out=environments/$(ENVIRONMENT)/$(COMMIT).tfplan
 
 apply: update init
 	terraform apply -auto-approve \
-	-var-file=environments/$(ENVIRONMENT).tfvars
+		-state=environments/$(ENVIRONMENT)/terraform.tfstate \
+		-var-file=environments/$(ENVIRONMENT)/terraform.tfvars
 
-check: init
-	terraform plan -detailed-exitcode
+apply-from-plan: update init plan-output
+#	terraform apply \
+#		-state=environments/$(ENVIRONMENT)/terraform.tfstate \
+#		-var-file=environments/$(ENVIRONMENT)/terraform.tfvars\
+#		environments/$(ENVIRONMENT)/$(COMMIT).tfplan
 
 clean: init
-	terraform destroy -force
+	terraform destroy #-force
 
 show: init
-	@terraform show -module-depth=-1
+	@terraform show \
+		-module-depth=-1 \
+		environments/$(ENVIRONMENT)/terraform.tfstate
 
 update:
 	@terraform get -update=true 1>/dev/null

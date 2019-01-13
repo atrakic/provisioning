@@ -3,7 +3,7 @@ terraform {
 }
 
 provider "hcloud" {
-   version = ">=  1.7.0"
+  version = ">=  1.7.0"
 }
 
 provider "external" {
@@ -25,7 +25,3 @@ provider "random" {
 provider "template" {
   version = "1.0.0"
 }
-
-#provider "tls" {
-#  version = "1.0.0"
-#}
