@@ -109,3 +109,7 @@ variable "google_managed_zone" {
 variable "google_credentials_file" {
   default = ""
 }
+
+variable "project_name" {
+  default = "demo"
+}

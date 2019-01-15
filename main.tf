@@ -1,7 +1,7 @@
 module "provider" {
   source = "./provider/hcloud"
 
-  project_name = "demo"
+  project_name = "${var.project_name}"
   token        = "${var.hcloud_token}"
   location     = "${var.hcloud_location}"
   type         = "${var.hcloud_type}"
