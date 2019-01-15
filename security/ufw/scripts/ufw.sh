@@ -3,7 +3,7 @@ set -e
 
 ufw --force reset
 #ufw allow ssh
-ufw allow from ${ssh_ip} # comment 'Only from myip'
+ufw allow from ${ssh_ip} to any port 22 # comment 'Only from myip'
 ufw allow in on ${private_interface} to any port ${vpn_port} # vpn on private interface
 ufw allow in on ${vpn_interface}
 ufw allow in on ${kubernetes_interface} # Kubernetes pod overlay interface

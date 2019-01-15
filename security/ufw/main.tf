@@ -40,6 +40,10 @@ EOF
   }
 }
 
+data "http" "my_ip" {
+  url = "http://ipv4.icanhazip.com"
+}
+
 data "template_file" "ufw" {
   template = "${file("${path.module}/scripts/ufw.sh")}"
 
@@ -48,5 +52,6 @@ data "template_file" "ufw" {
     kubernetes_interface = "${var.kubernetes_interface}"
     vpn_interface        = "${var.vpn_interface}"
     vpn_port             = "${var.vpn_port}"
+    ssh_ip               = "${chomp(data.http.my_ip.body)}"
   }
 }
