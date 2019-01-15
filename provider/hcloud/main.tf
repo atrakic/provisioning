@@ -62,6 +62,7 @@ resource "hcloud_server" "host" {
     inline = [
       "while fuser /var/lib/dpkg/lock >/dev/null 2>&1; do sleep 1; done",
       "apt-get update",
+      "apt-get upgrade -y",
       "apt-get install -yq ufw ${join(" ", var.apt_packages)}",
     ]
   }
