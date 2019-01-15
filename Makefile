@@ -52,7 +52,9 @@ apply-from-plan: update init plan-output
 #		environments/$(ENVIRONMENT)/$(COMMIT).tfplan
 
 clean: init
-	terraform destroy #-force
+	terraform destroy \
+		-state=environments/$(ENVIRONMENT)/terraform.tfstate
+#-auto-approve
 
 show: init
 	@terraform show \
@@ -70,6 +72,8 @@ graph:
 	@terraform graph -draw-cycles -module-depth=-1 | dot -Tpng > graph.png
 	@shotwell graph.png
 
-validate:  update
+fmt-check:
 	terraform fmt -check=true -diff=true
+
+validate:  update
 	terraform validate -check-variables=true .
