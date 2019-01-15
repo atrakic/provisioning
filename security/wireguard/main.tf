@@ -28,76 +28,6 @@ variable "vpn_iprange" {
   default = "10.0.1.0/24"
 }
 
-resource "null_resource" "wireguard" {
-  count = "${var.count}"
-
-  triggers {
-    count = "${var.count}"
-  }
-
-  connection {
-    host  = "${element(var.connections, count.index)}"
-    user  = "root"
-    agent = true
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "echo net.ipv4.ip_forward=1 >> /etc/sysctl.conf",
-      "sysctl -p",
-    ]
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "apt-get install -yq software-properties-common build-essential",
-      "add-apt-repository -y ppa:wireguard/wireguard",
-      "apt-get update",
-    ]
-  }
-
-  provisioner "remote-exec" {
-    script = "${path.module}/scripts/install-kernel-headers.sh"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "DEBIAN_FRONTEND=noninteractive apt-get install -yq wireguard-dkms wireguard-tools",
-    ]
-  }
-
-  provisioner "file" {
-    content     = "${element(data.template_file.interface-conf.*.rendered, count.index)}"
-    destination = "/etc/wireguard/${var.vpn_interface}.conf"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "chmod 700 /etc/wireguard/${var.vpn_interface}.conf",
-    ]
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "${join("\n", formatlist("echo '%s %s' >> /etc/hosts", data.template_file.vpn_ips.*.rendered, var.hostnames))}",
-      "systemctl is-enabled wg-quick@${var.vpn_interface} || systemctl enable wg-quick@${var.vpn_interface}",
-      "systemctl restart wg-quick@${var.vpn_interface}",
-    ]
-  }
-
-  provisioner "file" {
-    content     = "${element(data.template_file.overlay-route-service.*.rendered, count.index)}"
-    destination = "/etc/systemd/system/overlay-route.service"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "systemctl start overlay-route.service",
-      "systemctl is-enabled overlay-route.service || systemctl enable overlay-route.service",
-    ]
-  }
-}
-
 data "template_file" "interface-conf" {
   count    = "${var.count}"
   template = "${file("${path.module}/templates/interface.conf")}"
@@ -144,6 +74,79 @@ data "template_file" "vpn_ips" {
 
   vars {
     ip = "${cidrhost(var.vpn_iprange, count.index + 1)}"
+  }
+}
+
+resource "null_resource" "wireguard" {
+  count = "${var.count}"
+
+  triggers {
+    count = "${var.count}"
+  }
+
+  connection {
+    host    = "${element(var.connections, count.index)}"
+    user    = "root"
+    agent   = true
+    #timeout = "10m"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "echo net.ipv4.ip_forward=1 >> /etc/sysctl.conf",
+      "sysctl -p",
+    ]
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "apt-get install -yq software-properties-common build-essential",
+      "add-apt-repository -y ppa:wireguard/wireguard",
+      "apt-get update",
+    ]
+  }
+
+  provisioner "remote-exec" {
+    script = "${path.module}/scripts/install-kernel-headers.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "DEBIAN_FRONTEND=noninteractive apt-get install -yq wireguard-dkms wireguard-tools",
+    ]
+  }
+
+  provisioner "file" {
+    content     = "${element(data.template_file.interface-conf.*.rendered, count.index)}"
+    destination = "/etc/wireguard/${var.vpn_interface}.conf"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod 700 /etc/wireguard/${var.vpn_interface}.conf",
+    ]
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "${join("\n", formatlist("echo '%s %s' >> /etc/hosts", data.template_file.vpn_ips.*.rendered, var.hostnames))}",
+      "systemctl is-enabled wg-quick@${var.vpn_interface} || systemctl enable wg-quick@${var.vpn_interface}",
+      "sleep 1",
+      "systemctl restart wg-quick@${var.vpn_interface}",
+    ]
+  }
+
+  provisioner "file" {
+    content     = "${element(data.template_file.overlay-route-service.*.rendered, count.index)}"
+    destination = "/etc/systemd/system/overlay-route.service"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "systemctl start overlay-route.service",
+      "sleep 1",
+      "systemctl is-enabled overlay-route.service || systemctl enable overlay-route.service",
+    ]
   }
 }
 
