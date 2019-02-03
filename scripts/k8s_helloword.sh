@@ -6,7 +6,7 @@ app="hello-world"
 ip=$(hcloud server list | awk '/001/ {print $4}')
 port=8080
 type=ClusterIP
-replicas=5
+replicas=3
 
 case "$1" in
   "deploy")
@@ -20,7 +20,6 @@ case "$1" in
       --type=${type} \
       --name=${app}-svc
 
-    # Create multiple YAML objects from stdin
     cat <<EOF | kubectl create -f -
 ---
 apiVersion: extensions/v1beta1
@@ -49,7 +48,7 @@ status)
   kubectl get ingress $app-ing
   ;;
 run)
-  curl ${app}.${ip}.xip.io
+  curl "${app}.${ip}.xip.io"
  ;;
 clean)
   kubectl delete ingress ${app}-ing
