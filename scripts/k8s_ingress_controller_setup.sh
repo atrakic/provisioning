@@ -8,3 +8,4 @@ kubectl apply -f manifests/ingress/configmap.yml
 IP=$(hcloud server list | awk '/001/ {print $4}')
 curl -s $IP.xip.io
 
+kubectl get ingress
