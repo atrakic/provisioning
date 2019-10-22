@@ -49,6 +49,11 @@ apply: update init
 		-state=environments/$(ENVIRONMENT)/terraform.tfstate \
 		-var-file=environments/$(ENVIRONMENT)/terraform.tfvars
 
+destroy: ###
+	terraform destroy \
+		-state=environments/$(ENVIRONMENT)/terraform.tfstate \
+		-var-file=environments/$(ENVIRONMENT)/terraform.tfvars
+
 apply-from-plan: update init plan-output
 #	terraform apply \
 #		-state=environments/$(ENVIRONMENT)/terraform.tfstate \
