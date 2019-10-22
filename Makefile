@@ -10,7 +10,7 @@ COMMIT = $(shell git rev-parse --short HEAD)
 TERRAFORM := $(shell pwd)/terraform
 TMP ?= /tmp
 OS ?= $(shell uname -s | tr '[:upper:]' '[:lower:]')
-TERRAFORM_VERSION ?= 0.11.11
+TERRAFORM_VERSION ?= 0.11.14
 TERRAFORM_URL ?= https://releases.hashicorp.com/terraform/$(TERRAFORM_VERSION)/terraform_$(TERRAFORM_VERSION)_$(OS)_amd64.zip
 
 HCLOUD := $(shell pwd)/hcloud
